@@ -48,6 +48,26 @@ kbd{background:#1f2935;border:1px solid #2d3946;border-radius:4px;padding:1px 6p
         value="0"
         style="width:100%;">
 </div>
+<div style="margin-top:20px;">
+
+  Slide:
+
+  <input
+
+      type="number"
+
+      id="gotoSlide"
+
+      min="1"
+
+      max="85"
+
+      value="1"
+
+      style="width:70px;">
+
+</div>
+
 </main>
 <footer>Shortcuts: <kbd>←</kbd> Previous · <kbd>→</kbd> Next · <kbd>Space</kbd> Reveal / Hide</footer>
 <script>
@@ -61,11 +81,31 @@ const $prev = document.getElementById('prev');
 const $next = document.getElementById('next');
 const $shuffle = document.getElementById('shuffle');
 const $slider = document.getElementById('slider');
+const $gotoSlide = document.getElementById('gotoSlide');
   
+let shuffledOrder = [];
+let shuffledPos = 0;
 
+function createShuffleDeck() {
+
+    shuffledOrder = [...Array(SLIDES.length).keys()];
+
+    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [shuffledOrder[i], shuffledOrder[j]] =
+        [shuffledOrder[j], shuffledOrder[i]];
+
+    }
+
+    shuffledPos = 0;
+
+};
 function render(){
   const s = SLIDES[idx];
   $slider.value = idx;
+  $gotoSlide.value = idx + 1;
   $img.src = s.i;
   $img.alt = 'Slide ' + (idx+1);
   $counter.textContent = `Slide ${idx+1} / ${SLIDES.length}`;
@@ -94,24 +134,86 @@ function go(d){
   idx=n; render();
 }
 $reveal.onclick = toggle;
-$prev.onclick = ()=>go(-1);
-$next.onclick = ()=>go(1);
-  $shuffle.onclick = () => {
+$prev.onclick = () => {
 
-    let newIdx;
+    if (shuffledOrder.length > 0) {
 
-    do {
-        newIdx = Math.floor(Math.random() * SLIDES.length);
-    } while (newIdx === idx);
+        shuffledPos--;
 
-    idx = newIdx;
+        if (shuffledPos < 0)
+            shuffledPos = 0;
+
+        idx = shuffledOrder[shuffledPos];
+
+        shown = false;
+        render();
+
+    } else {
+
+        go(-1);
+
+    }
+
+};
+
+
+$next.onclick = () => {
+
+    if (shuffledOrder.length > 0) {
+
+        shuffledPos++;
+
+        if (shuffledPos >= shuffledOrder.length) {
+
+            createShuffleDeck();
+
+        }
+
+        idx = shuffledOrder[shuffledPos];
+
+        shown = false;
+        render();
+
+    } else {
+
+        go(1);
+
+    }
+
+};
+
+
+$shuffle.onclick = () => {
+
+    createShuffleDeck();
+
+    idx = shuffledOrder[0];
+
+    shuffledPos = 0;
+
     shown = false;
+
     render();
 
 };
-  $slider.oninput = () => {
+
+
+$slider.oninput = () => {
 
     idx = Number($slider.value);
+
+    shown = false;
+
+    render();
+
+};
+  $gotoSlide.oninput = () => {
+
+    idx = Number($gotoSlide.value) - 1;
+
+    if (idx < 0) idx = 0;
+    if (idx >= SLIDES.length) idx = SLIDES.length - 1;
+
     shown = false;
     render();
 

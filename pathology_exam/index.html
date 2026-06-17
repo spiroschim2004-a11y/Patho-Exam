@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Pathology Practical Exam — Who Am I?</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0a0e14;--panel:#121821;--border:#1f2935;--text:#e6edf3;--muted:#7d8590;--accent:#3fb950;--accent2:#2ea043;--danger:#f85149;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--panel)}
+header h1{font-size:18px;font-weight:600;letter-spacing:.5px}
+header h1 span{color:var(--accent)}
+.counter{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px}
+.stage{width:100%;max-width:1100px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;min-height:60vh}
+.stage img{max-width:100%;max-height:75vh;border-radius:6px;display:block;object-fit:contain}
+.diagnosis{min-height:56px;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px 20px;border-radius:10px;border:1px solid var(--border);background:var(--panel);max-width:1100px;width:100%;font-size:22px;font-weight:600;letter-spacing:.3px;transition:all .2s}
+.diagnosis.hidden{color:var(--muted);font-weight:400;font-size:15px;font-style:italic}
+.diagnosis.shown{color:var(--accent);border-color:var(--accent2)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button{background:var(--panel);color:var(--text);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}
+button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--accent2);border-color:var(--accent2);color:#fff;padding:14px 32px;font-size:16px;font-weight:600}
+button.primary:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+footer{padding:10px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+kbd{background:#1f2935;border:1px solid #2d3946;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px}
+</style></head>
+<body>
+<header>
+  <h1>Pathology Practical — <span>Who Am I?</span></h1>
+  <div class="counter" id="counter">Slide 1 / 1</div>
+</header>
+<main>
+  <div class="stage"><img id="slide" alt="Histology slide"></div>
+  <div class="diagnosis hidden" id="diagnosis">— diagnosis hidden —</div>
+  <div class="controls">
+    <button id="prev">← Previous</button>
+    <button id="reveal" class="primary">Reveal Diagnosis</button>
+    <button id="next">Next →</button>
+  </div>
+</main>
+<footer>Shortcuts: <kbd>←</kbd> Previous · <kbd>→</kbd> Next · <kbd>Space</kbd> Reveal / Hide</footer>
+<script>
+const SLIDES = [{"i": "Slide_01.png", "d": "Ischemic Renal Infarction"}, {"i": "Slide_02.png", "d": "Chronic Congestion Of The Liver"}, {"i": "Slide_03.png", "d": "Pulmonary Edema"}, {"i": "Slide_04.png", "d": "Microhemorrhages Of The Brain"}, {"i": "Slide_05.png", "d": "Mixed Thrombus"}, {"i": "Slide_06.png", "d": "Organizing And Recanalizing Thrombus"}, {"i": "Slide_07.png", "d": "Hemorrhagic Pulmonary Infarction"}, {"i": "Slide_08.png", "d": "Focal Serous Pneumonia"}, {"i": "Slide_09.png", "d": "Lobar Fibrinous Pneumonia"}, {"i": "Slide_10.png", "d": "Fibrinous Pericarditis"}, {"i": "Slide_11.png", "d": "Purulent Nephritis"}, {"i": "Slide_12.png", "d": "Granulation Tissue"}, {"i": "Slide_13.png", "d": "Foreign Body\u201d Granuloma"}, {"i": "Slide_14.png", "d": "Myocardial Scar"}, {"i": "Slide_15.png", "d": "Myocardial Scar"}, {"i": "Slide_16.png", "d": "Cirrhosis Of The Liver"}, {"i": "Slide_17.png", "d": "Tuberculous Granuloma"}, {"i": "Slide_18.png", "d": "Actinomycosis"}, {"i": "Slide_19.png", "d": "Sarcoidosis Of Lymph Node"}, {"i": "Slide_20.png", "d": "Allergic Nasal Polyp"}, {"i": "Slide_21.png", "d": "Hashimoto's Thyroiditis"}, {"i": "Slide_22.png", "d": "Acute Phlegmonous Appendicitis"}, {"i": "Slide_23.png", "d": "Liquefactive Necrosis Of The Brain"}, {"i": "Slide_24.png", "d": "Fat Necrosis Of The Pancreas"}, {"i": "Slide_25.png", "d": "Coagulative Necrosis Of The Heart"}, {"i": "Slide_26.png", "d": "Brown Induration Of The Lung"}, {"i": "Slide_27.png", "d": "Amyloidosis Of Glomeruli Of The Kidney"}, {"i": "Slide_28.png", "d": "Amyloidosis Of Glomeruli Of The Kidney"}, {"i": "Slide_29.png", "d": "Icterus Of The Liver"}, {"i": "Slide_30.png", "d": "Anthracosis Of The Lung"}, {"i": "Slide_31.png", "d": "Steatosis Of The Liver"}, {"i": "Slide_32.png", "d": "Hyaline Changes In Corpus Albicans Of The Ovary"}, {"i": "Slide_33.png", "d": "Brown Atrophy Of Heart"}, {"i": "Slide_34.png", "d": "Hypertrophy Of Heart"}, {"i": "Slide_35.png", "d": "Hyperplasia Of Endometrial Mucosa"}, {"i": "Slide_36.png", "d": "Fibrinoid Necrosis In Peptic Ulcer Of The Stomach"}, {"i": "Slide_37.png", "d": "Necrosis Of The Lymph Node"}, {"i": "Slide_38.png", "d": "Intradermal Pigmented Nevus"}, {"i": "Slide_39.png", "d": "Fibroadenoma Of The Breast"}, {"i": "Slide_40.png", "d": "Serous Papillary Cystadenoma Of The Ovary"}, {"i": "Slide_41.png", "d": "Mucinous Cystadenoma Of Ovary"}, {"i": "Slide_42.png", "d": "Squamous Cell Carcinoma Of The Skin"}, {"i": "Slide_43.png", "d": "Basal Cell Carcinoma"}, {"i": "Slide_44.png", "d": "Adenocarcinoma Of The Large Bowel"}, {"i": "Slide_45.png", "d": "Teratoma Of The Ovary"}, {"i": "Slide_46.png", "d": "Seminoma Of The Testis"}, {"i": "Slide_47.png", "d": "Renal Cell Carcinoma"}, {"i": "Slide_48.png", "d": "Hepatocellular Carcinoma"}, {"i": "Slide_49.png", "d": "Fibroma Of The Ovary"}, {"i": "Slide_50.png", "d": "Leiomyoma Of The Uterus"}, {"i": "Slide_51.png", "d": "Lipoma"}, {"i": "Slide_52.png", "d": "Chondroma"}, {"i": "Slide_53.png", "d": "Cavernous Hemangioma Of Liver"}, {"i": "Slide_54.png", "d": "Osteosarcoma"}, {"i": "Slide_55.png", "d": "Leiomyosarcoma"}, {"i": "Slide_56.png", "d": "Neurinoma"}, {"i": "Slide_57.png", "d": "Meningioma"}, {"i": "Slide_58.png", "d": "Malignant Melanoma"}, {"i": "Slide_59.png", "d": "Dysplastic Changes In Uterine Cervix"}, {"i": "Slide_60.png", "d": "Urothelial Carcinoma"}, {"i": "Slide_61.png", "d": "Undifferentiated Small Cell Carcinoma Of Lung"}, {"i": "Slide_62.png", "d": "Invasive Cervical /Squamous Cell / Carcinoma"}, {"i": "Slide_63.png", "d": "Endometrial Adenocarcinoma"}, {"i": "Slide_64.png", "d": "Serous Papillary Adenocarcinoma Of The Ovary"}, {"i": "Slide_65.png", "d": "Invasive Ductal Breast Carcinoma Nos"}, {"i": "Slide_66.png", "d": "Chronic Myelogenous Leukemia"}, {"i": "Slide_67.png", "d": "Chronic Lymphocytic Leukemia \u2013 Liver"}, {"i": "Slide_68.png", "d": "Hodgkin's Disease, Mixed Cellular Type"}, {"i": "Slide_69.png", "d": "Thyroid Papillary Adenocarcinoma"}, {"i": "Slide_70.png", "d": "Choriocarcinoma"}, {"i": "Slide_71.png", "d": "Squamous Cell Carcinoma Of The Penis"}, {"i": "Slide_72.png", "d": "Adenocarcinoma Gl. Prostatae"}, {"i": "Slide_73.png", "d": "Gastric Cancer, Diffuse Type"}, {"i": "Slide_74.png", "d": "Lobular Pneumonia With Abscess Formation"}, {"i": "Slide_75.png", "d": "Silicosis Of The Lung"}, {"i": "Slide_76.png", "d": "Pulmonary Emphysema"}, {"i": "Slide_77.png", "d": "Subacute Glomerulonephritis"}, {"i": "Slide_78.png", "d": "Chronic Pyelonephritis"}, {"i": "Slide_79.png", "d": "Fibrocystic Disease Of The Breast"}, {"i": "Slide_80.png", "d": "Neonatal Respiratory Distress Syndrome (Lung) = Hyaline Membrane"}, {"i": "Slide_81.png", "d": "Grave's Disease - Diffuse Toxic Goiter"}, {"i": "Slide_82.png", "d": "Non-Toxic Nodular Colloid Goiter"}, {"i": "Slide_83.png", "d": "Diabetic Nephropathy \u2013 Nodular Glomerulosclerosis"}, {"i": "Slide_84.png", "d": "Intestinal Metaplasia In The Stomach Mucosa"}, {"i": "Slide_85.png", "d": "Prostatic Hyperplasia"}];
+let idx = 0, shown = false;
+const $img = document.getElementById('slide');
+const $diag = document.getElementById('diagnosis');
+const $counter = document.getElementById('counter');
+const $reveal = document.getElementById('reveal');
+const $prev = document.getElementById('prev');
+const $next = document.getElementById('next');
+
+function render(){
+  const s = SLIDES[idx];
+  $img.src = s.i;
+  $img.alt = 'Slide ' + (idx+1);
+  $counter.textContent = `Slide ${idx+1} / ${SLIDES.length}`;
+  shown = false;
+  $diag.textContent = '— diagnosis hidden —';
+  $diag.className = 'diagnosis hidden';
+  $reveal.textContent = 'Reveal Diagnosis';
+  $prev.disabled = idx===0;
+  $next.disabled = idx===SLIDES.length-1;
+}
+function toggle(){
+  shown = !shown;
+  if(shown){
+    $diag.textContent = SLIDES[idx].d;
+    $diag.className = 'diagnosis shown';
+    $reveal.textContent = 'Hide Diagnosis';
+  } else {
+    $diag.textContent = '— diagnosis hidden —';
+    $diag.className = 'diagnosis hidden';
+    $reveal.textContent = 'Reveal Diagnosis';
+  }
+}
+function go(d){
+  const n = idx+d;
+  if(n<0||n>=SLIDES.length) return;
+  idx=n; render();
+}
+$reveal.onclick = toggle;
+$prev.onclick = ()=>go(-1);
+$next.onclick = ()=>go(1);
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight') go(1);
+  else if(e.key==='ArrowLeft') go(-1);
+  else if(e.key===' '){e.preventDefault();toggle();}
+});
+render();
+</script></body></html>

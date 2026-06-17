@@ -137,53 +137,15 @@ function go(d){
 }
 $reveal.onclick = toggle;
 $prev.onclick = () => {
-
-    if (shuffleMode) {
-
-        shuffledPos--;
-
-        if (shuffledPos < 0)
-            shuffledPos = 0;
-
-        idx = shuffledOrder[shuffledPos];
-
-        shown = false;
-        render();
-
-    } else {
-
-        go(-1);
-
-    }
-
+    shuffleMode = false;
+    go(-1);
 };
 
 
 $next.onclick = () => {
-
-    if (shuffleMode) {
-
-        shuffledPos++;
-
-        if (shuffledPos >= shuffledOrder.length) {
-
-            createShuffleDeck();
-
-        }
-
-        idx = shuffledOrder[shuffledPos];
-
-        shown = false;
-        render();
-
-    } else {
-
-        go(1);
-
-    }
-
+    shuffleMode = false;
+    go(1);
 };
-
 
 $shuffle.onclick = () => {
 
@@ -203,6 +165,8 @@ $shuffle.onclick = () => {
 
 $slider.oninput = () => {
 
+    shuffleMode = false;
+
     idx = Number($slider.value);
 
     shown = false;
@@ -212,12 +176,15 @@ $slider.oninput = () => {
 };
   $gotoSlide.oninput = () => {
 
+    shuffleMode = false;
+
     idx = Number($gotoSlide.value) - 1;
 
     if (idx < 0) idx = 0;
     if (idx >= SLIDES.length) idx = SLIDES.length - 1;
 
     shown = false;
+
     render();
 
 };

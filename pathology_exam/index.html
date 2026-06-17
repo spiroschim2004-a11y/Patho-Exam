@@ -85,6 +85,7 @@ const $gotoSlide = document.getElementById('gotoSlide');
   
 let shuffledOrder = [];
 let shuffledPos = 0;
+let shuffleMode = false;
 
 function createShuffleDeck() {
 
@@ -131,12 +132,13 @@ function toggle(){
 function go(d){
   const n = idx+d;
   if(n<0||n>=SLIDES.length) return;
+  shuffleMode = false;
   idx=n; render();
 }
 $reveal.onclick = toggle;
 $prev.onclick = () => {
 
-    if (shuffledOrder.length > 0) {
+    if (shuffleMode) {
 
         shuffledPos--;
 
@@ -159,7 +161,7 @@ $prev.onclick = () => {
 
 $next.onclick = () => {
 
-    if (shuffledOrder.length > 0) {
+    if (shuffleMode) {
 
         shuffledPos++;
 
@@ -186,6 +188,7 @@ $next.onclick = () => {
 $shuffle.onclick = () => {
 
     createShuffleDeck();
+  shuffleMode = true;
 
     idx = shuffledOrder[0];
 
